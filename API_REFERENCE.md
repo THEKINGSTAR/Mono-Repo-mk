@@ -26,7 +26,7 @@ Creates a new agent session with an isolated container environment.
 **Endpoint**: `POST /sessions`
 
 **Request Body**:
-```json
+\`\`\`json
 {
   "name": "My Agent Session",
   "config": {
@@ -34,10 +34,10 @@ Creates a new agent session with an isolated container environment.
     "max_messages": 100
   }
 }
-```
+\`\`\`
 
 **Response**:
-```json
+\`\`\`json
 {
   "id": "550e8400-e29b-41d4-a716-446655440000",
   "status": "active",
@@ -45,17 +45,17 @@ Creates a new agent session with an isolated container environment.
   "websocket_url": "/ws/550e8400-e29b-41d4-a716-446655440000",
   "created_at": "2024-01-15T10:30:00Z"
 }
-```
+\`\`\`
 
 **cURL Example**:
-```bash
+\`\`\`bash
 curl -X POST "http://localhost:8000/sessions" \
      -H "Content-Type: application/json" \
      -d '{
        "name": "Test Session",
        "config": {"timeout": 1800}
      }'
-```
+\`\`\`
 
 #### Get Session Details
 
@@ -64,7 +64,7 @@ Retrieves information about a specific session.
 **Endpoint**: `GET /sessions/{session_id}`
 
 **Response**:
-```json
+\`\`\`json
 {
   "id": "550e8400-e29b-41d4-a716-446655440000",
   "status": "active",
@@ -74,12 +74,12 @@ Retrieves information about a specific session.
   "container_id": "docker-container-123",
   "vnc_port": 5900
 }
-```
+\`\`\`
 
 **cURL Example**:
-```bash
+\`\`\`bash
 curl "http://localhost:8000/sessions/550e8400-e29b-41d4-a716-446655440000"
-```
+\`\`\`
 
 #### List Sessions
 
@@ -93,7 +93,7 @@ Retrieves a list of all sessions.
 - `offset` (optional): Pagination offset (default: 0)
 
 **Response**:
-```json
+\`\`\`json
 {
   "sessions": [
     {
@@ -106,12 +106,12 @@ Retrieves a list of all sessions.
   "limit": 50,
   "offset": 0
 }
-```
+\`\`\`
 
 **cURL Example**:
-```bash
+\`\`\`bash
 curl "http://localhost:8000/sessions?status=active&limit=10"
-```
+\`\`\`
 
 #### End Session
 
@@ -120,18 +120,18 @@ Terminates a session and cleans up associated resources.
 **Endpoint**: `DELETE /sessions/{session_id}`
 
 **Response**:
-```json
+\`\`\`json
 {
   "message": "Session ended successfully",
   "session_id": "550e8400-e29b-41d4-a716-446655440000",
   "ended_at": "2024-01-15T11:30:00Z"
 }
-```
+\`\`\`
 
 **cURL Example**:
-```bash
+\`\`\`bash
 curl -X DELETE "http://localhost:8000/sessions/550e8400-e29b-41d4-a716-446655440000"
-```
+\`\`\`
 
 ### Chat History
 
@@ -147,7 +147,7 @@ Retrieves the conversation history for a session.
 - `role` (optional): Filter by role (`user`, `assistant`)
 
 **Response**:
-```json
+\`\`\`json
 {
   "messages": [
     {
@@ -170,12 +170,12 @@ Retrieves the conversation history for a session.
   "total": 2,
   "session_id": "550e8400-e29b-41d4-a716-446655440000"
 }
-```
+\`\`\`
 
 **cURL Example**:
-```bash
+\`\`\`bash
 curl "http://localhost:8000/sessions/550e8400-e29b-41d4-a716-446655440000/history?limit=20"
-```
+\`\`\`
 
 #### Clear Chat History
 
@@ -184,13 +184,13 @@ Clears the conversation history for a session.
 **Endpoint**: `DELETE /sessions/{session_id}/history`
 
 **Response**:
-```json
+\`\`\`json
 {
   "message": "Chat history cleared",
   "session_id": "550e8400-e29b-41d4-a716-446655440000",
   "cleared_messages": 15
 }
-```
+\`\`\`
 
 ### System Endpoints
 
@@ -201,7 +201,7 @@ Checks the health status of the backend services.
 **Endpoint**: `GET /health`
 
 **Response**:
-```json
+\`\`\`json
 {
   "status": "healthy",
   "timestamp": "2024-01-15T10:30:00Z",
@@ -212,7 +212,7 @@ Checks the health status of the backend services.
   },
   "version": "1.0.0"
 }
-```
+\`\`\`
 
 #### System Metrics
 
@@ -221,12 +221,12 @@ Provides system metrics (Prometheus format).
 **Endpoint**: `GET /metrics`
 
 **Response**: Prometheus metrics format
-```
+\`\`\`
 # HELP http_requests_total Total HTTP requests
 # TYPE http_requests_total counter
 http_requests_total{method="GET",endpoint="/sessions"} 42
 http_requests_total{method="POST",endpoint="/sessions"} 15
-```
+\`\`\`
 
 ## 🔌 WebSocket API
 
@@ -238,7 +238,7 @@ Connect to the WebSocket endpoint for real-time communication with the Claude ag
 
 #### Connection
 
-```javascript
+\`\`\`javascript
 const ws = new WebSocket('ws://localhost:8000/ws/550e8400-e29b-41d4-a716-446655440000');
 
 ws.onopen = function(event) {
@@ -257,34 +257,34 @@ ws.onerror = function(error) {
 ws.onclose = function(event) {
     console.log('Connection closed');
 };
-```
+\`\`\`
 
 #### Send Message
 
 Send a message to the Claude agent:
 
-```javascript
+\`\`\`javascript
 const message = {
     content: "Take a screenshot of the desktop"
 };
 
 ws.send(JSON.stringify(message));
-```
+\`\`\`
 
 #### Message Format
 
 **Outgoing Message** (Client to Server):
-```json
+\`\`\`json
 {
   "content": "Your message to the agent",
   "metadata": {
     "timestamp": "2024-01-15T10:31:00Z"
   }
 }
-```
+\`\`\`
 
 **Incoming Message** (Server to Client):
-```json
+\`\`\`json
 {
   "type": "agent_response",
   "content": "Agent's response text",
@@ -294,7 +294,7 @@ ws.send(JSON.stringify(message));
     "processing_time": 2.5
   }
 }
-```
+\`\`\`
 
 #### Message Types
 
@@ -305,7 +305,7 @@ ws.send(JSON.stringify(message));
 5. **heartbeat**: Connection keep-alive
 
 **Tool Execution Message**:
-```json
+\`\`\`json
 {
   "type": "tool_execution",
   "tool": "screenshot",
@@ -316,17 +316,17 @@ ws.send(JSON.stringify(message));
   },
   "timestamp": "2024-01-15T10:31:03Z"
 }
-```
+\`\`\`
 
 **Error Message**:
-```json
+\`\`\`json
 {
   "type": "error",
   "error": "Tool execution failed",
   "details": "Screenshot tool not available",
   "timestamp": "2024-01-15T10:31:03Z"
 }
-```
+\`\`\`
 
 ### VNC WebSocket
 
@@ -356,7 +356,7 @@ This endpoint provides a WebSocket proxy to the VNC server running in the agent'
 
 ### Error Response Format
 
-```json
+\`\`\`json
 {
   "error": "Error type",
   "message": "Human readable error message",
@@ -366,7 +366,7 @@ This endpoint provides a WebSocket proxy to the VNC server running in the agent'
   "timestamp": "2024-01-15T10:30:00Z",
   "request_id": "req-123456"
 }
-```
+\`\`\`
 
 ## 🚦 Rate Limiting
 
@@ -377,23 +377,23 @@ The API implements rate limiting to prevent abuse:
 - **WebSocket Connections**: 5 connections per minute per IP
 
 Rate limit headers are included in responses:
-```
+\`\`\`
 X-RateLimit-Limit: 100
 X-RateLimit-Remaining: 95
 X-RateLimit-Reset: 1642248600
-```
+\`\`\`
 
 ## 📄 Pagination
 
 List endpoints support pagination:
 
 **Request**:
-```
+\`\`\`
 GET /sessions?limit=20&offset=40
-```
+\`\`\`
 
 **Response**:
-```json
+\`\`\`json
 {
   "data": [...],
   "pagination": {
@@ -404,7 +404,7 @@ GET /sessions?limit=20&offset=40
     "has_prev": true
   }
 }
-```
+\`\`\`
 
 ## 🔍 Filtering and Sorting
 
@@ -412,25 +412,25 @@ GET /sessions?limit=20&offset=40
 
 Most list endpoints support filtering:
 
-```
+\`\`\`
 GET /sessions?status=active&created_after=2024-01-01
 GET /sessions/{id}/history?role=user&limit=50
-```
+\`\`\`
 
 ### Sorting
 
 Use the `sort` parameter:
 
-```
+\`\`\`
 GET /sessions?sort=created_at:desc
 GET /sessions?sort=status:asc,created_at:desc
-```
+\`\`\`
 
 ## 🛠️ SDK Examples
 
 ### Python SDK
 
-```python
+\`\`\`python
 import asyncio
 import aiohttp
 import websockets
@@ -517,11 +517,11 @@ async def main():
 
 if __name__ == "__main__":
     asyncio.run(main())
-```
+\`\`\`
 
 ### JavaScript SDK
 
-```javascript
+\`\`\`javascript
 class CambioMLClient {
     constructor(baseUrl = 'http://localhost:8000') {
         this.baseUrl = baseUrl;
@@ -651,6 +651,6 @@ async function demo() {
 }
 
 demo().catch(console.error);
-```
+\`\`\`
 
 This comprehensive API reference provides all the information needed to integrate with the CambioML Computer Use Agent Backend, including detailed examples and error handling patterns.
