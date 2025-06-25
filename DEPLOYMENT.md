@@ -22,7 +22,7 @@ This guide covers deployment strategies for various environments:
    - Docker and Docker Compose installed
 
 2. **Setup Production Environment**
-   ```bash
+   \`\`\`bash
    # Clone repository
    git clone <your-repo-url>
    cd cambioml-backend
@@ -33,19 +33,19 @@ This guide covers deployment strategies for various environments:
    
    # Install Docker (if needed)
    ./scripts/docker_setup.sh
-   ```
+   \`\`\`
 
 3. **Production Configuration**
-   ```bash
+   \`\`\`bash
    # Use production compose file
    docker-compose -f docker-compose.prod.yml up -d
    
    # Or use the management script
    ./scripts/docker_commands.sh start
-   ```
+   \`\`\`
 
 4. **SSL/TLS Setup**
-   ```bash
+   \`\`\`bash
    # Generate SSL certificates (Let's Encrypt)
    sudo apt install certbot
    sudo certbot certonly --standalone -d your-domain.com
@@ -53,11 +53,11 @@ This guide covers deployment strategies for various environments:
    # Copy certificates
    sudo cp /etc/letsencrypt/live/your-domain.com/fullchain.pem ssl/
    sudo cp /etc/letsencrypt/live/your-domain.com/privkey.pem ssl/
-   ```
+   \`\`\`
 
 ### Load Balancer Configuration
 
-```nginx
+\`\`\`nginx
 # /etc/nginx/sites-available/cambioml
 upstream cambioml_backend {
     server 127.0.0.1:8000;
@@ -116,13 +116,13 @@ server {
         proxy_set_header X-Forwarded-Proto $scheme;
     }
 }
-```
+\`\`\`
 
 ## ☸️ Kubernetes Deployment
 
 ### Kubernetes Manifests
 
-```yaml
+\`\`\`yaml
 # k8s/namespace.yaml
 apiVersion: v1
 kind: Namespace
@@ -333,11 +333,11 @@ spec:
             name: cambioml-backend
             port:
               number: 80
-```
+\`\`\`
 
 ### Kubernetes Deployment Commands
 
-```bash
+\`\`\`bash
 # Create namespace and deploy
 kubectl apply -f k8s/
 
@@ -352,13 +352,13 @@ kubectl scale deployment cambioml-backend --replicas=5 -n cambioml
 
 # Update deployment
 kubectl set image deployment/cambioml-backend backend=cambioml-backend:v2 -n cambioml
-```
+\`\`\`
 
 ## ☁️ Cloud Platform Deployments
 
 ### AWS ECS Deployment
 
-```json
+\`\`\`json
 {
   "family": "cambioml-backend",
   "networkMode": "awsvpc",
@@ -410,11 +410,11 @@ kubectl set image deployment/cambioml-backend backend=cambioml-backend:v2 -n cam
     }
   ]
 }
-```
+\`\`\`
 
 ### Google Cloud Run Deployment
 
-```yaml
+\`\`\`yaml
 # cloud-run.yaml
 apiVersion: serving.knative.dev/v1
 kind: Service
@@ -453,18 +453,18 @@ spec:
           requests:
             cpu: "1"
             memory: "1Gi"
-```
+\`\`\`
 
-```bash
+\`\`\`bash
 # Deploy to Cloud Run
 gcloud run services replace cloud-run.yaml --region=us-central1
-```
+\`\`\`
 
 ## 🔄 CI/CD Pipeline
 
 ### GitHub Actions Workflow
 
-```yaml
+\`\`\`yaml
 # .github/workflows/deploy.yml
 name: Deploy CambioML Backend
 
@@ -561,13 +561,13 @@ jobs:
         # Add your deployment commands here
         # e.g., kubectl, docker-compose, cloud CLI commands
         echo "Deploying to production..."
-```
+\`\`\`
 
 ## 📊 Monitoring and Observability
 
 ### Prometheus Metrics
 
-```python
+\`\`\`python
 # Add to app/main.py
 from prometheus_client import Counter, Histogram, generate_latest
 
@@ -589,11 +589,11 @@ async def metrics_middleware(request: Request, call_next):
 @app.get("/metrics")
 async def metrics():
     return Response(generate_latest(), media_type="text/plain")
-```
+\`\`\`
 
 ### Grafana Dashboard
 
-```json
+\`\`\`json
 {
   "dashboard": {
     "title": "CambioML Backend Metrics",
@@ -628,11 +628,11 @@ async def metrics():
     ]
   }
 }
-```
+\`\`\`
 
 ### Health Checks
 
-```python
+\`\`\`python
 # Add to app/main.py
 @app.get("/health")
 async def health_check():
@@ -659,13 +659,13 @@ async def health_check():
         }
     except Exception as e:
         raise HTTPException(status_code=503, detail=f"Health check failed: {str(e)}")
-```
+\`\`\`
 
 ## 💾 Backup and Recovery
 
 ### Database Backup
 
-```bash
+\`\`\`bash
 #!/bin/bash
 # backup_db.sh
 
@@ -683,18 +683,18 @@ gzip $BACKUP_DIR/backup_$DATE.sql
 find $BACKUP_DIR -name "backup_*.sql.gz" -mtime +7 -delete
 
 echo "Backup completed: backup_$DATE.sql.gz"
-```
+\`\`\`
 
 ### Automated Backup with Cron
 
-```bash
+\`\`\`bash
 # Add to crontab
 0 2 * * * /path/to/backup_db.sh >> /var/log/backup.log 2>&1
-```
+\`\`\`
 
 ### Disaster Recovery
 
-```bash
+\`\`\`bash
 #!/bin/bash
 # restore_db.sh
 
@@ -715,13 +715,13 @@ gunzip -c $BACKUP_FILE | docker-compose exec -T postgres psql -U cambioml -d cam
 docker-compose start backend
 
 echo "Database restored from $BACKUP_FILE"
-```
+\`\`\`
 
 ## 🔒 Security Hardening
 
 ### Container Security
 
-```dockerfile
+\`\`\`dockerfile
 # Use non-root user
 FROM python:3.11-slim
 RUN groupadd -r cambioml && useradd -r -g cambioml cambioml
@@ -732,11 +732,11 @@ RUN apt-get update && apt-get upgrade -y && rm -rf /var/lib/apt/lists/*
 
 # Read-only filesystem
 VOLUME ["/tmp"]
-```
+\`\`\`
 
 ### Network Security
 
-```yaml
+\`\`\`yaml
 # docker-compose.prod.yml
 version: '3.8'
 services:
@@ -759,11 +759,11 @@ networks:
     internal: true
   external:
     driver: bridge
-```
+\`\`\`
 
 ### Secrets Management
 
-```bash
+\`\`\`bash
 # Using Docker Secrets
 echo "your_api_key" | docker secret create anthropic_api_key -
 
@@ -778,13 +778,13 @@ services:
 secrets:
   anthropic_api_key:
     external: true
-```
+\`\`\`
 
 ## 📈 Performance Tuning
 
 ### Database Optimization
 
-```sql
+\`\`\`sql
 -- PostgreSQL configuration
 -- postgresql.conf
 
@@ -796,11 +796,11 @@ wal_buffers = 16MB
 default_statistics_target = 100
 random_page_cost = 1.1
 effective_io_concurrency = 200
-```
+\`\`\`
 
 ### Application Optimization
 
-```python
+\`\`\`python
 # app/main.py
 from fastapi import FastAPI
 import uvicorn
@@ -818,11 +818,11 @@ if __name__ == "__main__":
         access_log=False,  # Disable in production
         server_header=False,  # Security
     )
-```
+\`\`\`
 
 ### Load Balancing
 
-```nginx
+\`\`\`nginx
 upstream cambioml_backend {
     server backend1:8000;
     server backend2:8000;
@@ -846,14 +846,14 @@ server {
         proxy_read_timeout 86400;
     }
 }
-```
+\`\`\`
 
 ## 🐛 Troubleshooting Production Issues
 
 ### Common Production Problems
 
 1. **High Memory Usage**
-   ```bash
+   \`\`\`bash
    # Monitor memory usage
    docker stats
    
@@ -863,10 +863,10 @@ server {
    process = psutil.Process()
    print(f'Memory: {process.memory_info().rss / 1024 / 1024:.2f} MB')
    "
-   ```
+   \`\`\`
 
 2. **Database Connection Pool Exhaustion**
-   ```python
+   \`\`\`python
    # Increase pool size in database.py
    engine = create_engine(
        DATABASE_URL,
@@ -874,20 +874,20 @@ server {
        max_overflow=50,
        pool_timeout=60
    )
-   ```
+   \`\`\`
 
 3. **WebSocket Connection Issues**
-   ```bash
+   \`\`\`bash
    # Check WebSocket connections
    netstat -an | grep :8000
    
    # Monitor WebSocket metrics
    curl http://localhost:8000/metrics | grep websocket
-   ```
+   \`\`\`
 
 ### Log Analysis
 
-```bash
+\`\`\`bash
 # Centralized logging with ELK stack
 docker run -d \
   --name elasticsearch \
@@ -910,6 +910,6 @@ filebeat.inputs:
 
 output.elasticsearch:
   hosts: ["elasticsearch:9200"]
-```
+\`\`\`
 
 This comprehensive deployment guide covers all aspects of taking the CambioML Computer Use Agent Backend from development to production, including security, monitoring, and troubleshooting considerations.
