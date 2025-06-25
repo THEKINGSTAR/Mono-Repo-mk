@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CambioML Computer Use Agent</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        .header {
+            background: #2563eb;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        .main-content {
+            display: flex;
+            height: 600px;
+        }
+        .chat-panel {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            border-right: 1px solid #e5e7eb;
+        }
+        .vnc-panel {
+            flex: 1;
+            background: #000;
+            position: relative;
+        }
+        .chat-messages {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            background: #f9fafb;
+        }
+        .message {
+            margin-bottom: 15px;
+            padding: 10px;
+            border-radius: 8px;
+        }
+        .user-message {
+            background: #dbeafe;
+            margin-left: 20px;
+        }
+        .assistant-message {
+            background: #f3f4f6;
+            margin-right: 20px;
+        }
+        .chat-input {
+            padding: 20px;
+            border-top: 1px solid #e5e7eb;
+        }
+        .input-group {
+            display: flex;
+            gap: 10px;
+        }
+        .input-group input {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #d1d5db;
+            border-radius: 4px;
+        }
+        .input-group button {
+            padding: 10px 20px;
+            background: #2563eb;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .input-group button:hover {
+            background: #1d4ed8;
+        }
+        .status {
+            padding: 10px 20px;
+            background: #f3f4f6;
+            border-bottom: 1px solid #e5e7eb;
+            font-size: 14px;
+        }
+        .status.connected {
+            background: #dcfce7;
+            color: #166534;
+        }
+        .status.disconnected {
+            background: #fef2f2;
+            color: #dc2626;
+        }
+        #vnc-frame {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+        .loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            color: #6b7280;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>CambioML Computer Use Agent</h1>
+            <p>AI Agent with Computer Control Capabilities</p>
+        </div>
+        
+        <div class="status" id="status">
+            <span id="status-text">Initializing...</span>
+        </div>
+        
+        <div class="main-content">
+            <div class="chat-panel">
+                <div class="chat-messages" id="chat-messages">
+                    <div class="message assistant-message">
+                        <strong>Assistant:</strong> Hello! I'm your computer use agent. I can help you control the computer through natural language commands. What would you like me to do?
+                    </div>
+                </div>
+                <div class="chat-input">
+                    <div class="input-group">
+                        <input type="text" id="message-input" placeholder="Type your message..." disabled>
+                        <button id="send-button" disabled>Send</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="vnc-panel">
+                <div class="loading" id="vnc-loading">
+                    <div>Loading VNC connection...</div>
+                </div>
+                <iframe id="vnc-frame" style="display: none;"></iframe>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        class ComputerUseClient {
+            constructor() {
+                this.sessionId = null;
+                this.websocket = null;
+                this.isConnected = false;
+                
+                this.initializeElements();
+                this.createSession();
+            }
+            
+            initializeElements() {
+                this.statusElement = document.getElementById('status');
+                this.statusText = document.getElementById('status-text');
+                this.messagesContainer = document.getElementById('chat-messages');
+                this.messageInput = document.getElementById('message-input');
+                this.sendButton = document.getElementById('send-button');
+                this.vncFrame = document.getElementById('vnc-frame');
+                this.vncLoading = document.getElementById('vnc-loading');
+                
+                this.messageInput.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') {
+                        this.sendMessage();
+                    }
+                });
+                
+                this.sendButton.addEventListener('click', () => {
+                    this.sendMessage();
+                });
+            }
+            
+            async createSession() {
+                try {
+                    this.updateStatus('Creating session...', 'disconnected');
+                    
+                    const response = await fetch('/sessions', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({})
+                    });
+                    
+                    if (!response.ok) {
+                        throw new Error('Failed to create session');
+                    }
+                    
+                    const session = await response.json();
+                    this.sessionId = session.id;
+                    
+                    // Setup VNC
+                    this.setupVNC(session.vnc_url);
+                    
+                    // Connect WebSocket
+                    this.connectWebSocket();
+                    
+                } catch (error) {
+                    console.error('Error creating session:', error);
+                    this.updateStatus('Failed to create session', 'disconnected');
+                }
+            }
+            
+            setupVNC(vncUrl) {
+                // For demo purposes, we'll show a placeholder
+                // In production, you'd integrate with noVNC
+                setTimeout(() => {
+                    this.vncLoading.style.display = 'none';
+                    this.vncFrame.style.display = 'block';
+                    this.vncFrame.src = `http://localhost:6080/vnc.html?autoconnect=true&resize=scale`;
+                }, 2000);
+            }
+            
+            connectWebSocket() {
+                const wsUrl = `ws://localhost:8000/ws/${this.sessionId}`;
+                this.websocket = new WebSocket(wsUrl);
+                
+                this.websocket.onopen = () => {
+                    this.isConnected = true;
+                    this.updateStatus('Connected', 'connected');
+                    this.messageInput.disabled = false;
+                    this.sendButton.disabled = false;
+                };
+                
+                this.websocket.onmessage = (event) => {
+                    const data = JSON.parse(event.data);
+                    this.handleWebSocketMessage(data);
+                };
+                
+                this.websocket.onclose = () => {
+                    this.isConnected = false;
+                    this.updateStatus('Disconnected', 'disconnected');
+                    this.messageInput.disabled = true;
+                    this.sendButton.disabled = true;
+                };
+                
+                this.websocket.onerror = (error) => {
+                    console.error('WebSocket error:', error);
+                    this.updateStatus('Connection error', 'disconnected');
+                };
+            }
+            
+            handleWebSocketMessage(data) {
+                if (data.type === 'agent_response') {
+                    this.appendMessage('assistant', data.content, false);
+                }
+            }
+            
+            sendMessage() {
+                const message = this.messageInput.value.trim();
+                if (!message || !this.isConnected) return;
+                
+                // Add user message to chat
+                this.appendMessage('user', message);
+                
+                // Send to WebSocket
+                this.websocket.send(JSON.stringify({
+                    content: message
+                }));
+                
+                // Clear input
+                this.messageInput.value = '';
+            }
+            
+            appendMessage(role, content, isNew = true) {
+                const messageDiv = document.createElement('div');
+                messageDiv.className = `message ${role}-message`;
+                
+                const roleLabel = role === 'user' ? 'You' : 'Assistant';
+                messageDiv.innerHTML = `<strong>${roleLabel}:</strong> ${content}`;
+                
+                if (isNew) {
+                    this.messagesContainer.appendChild(messageDiv);
+                } else {
+                    // For streaming responses, update the last assistant message
+                    const lastMessage = this.messagesContainer.lastElementChild;
+                    if (lastMessage && lastMessage.classList.contains('assistant-message')) {
+                        lastMessage.innerHTML += content;
+                    } else {
+                        this.messagesContainer.appendChild(messageDiv);
+                    }
+                }
+                
+                this.messagesContainer.scrollTop = this.messagesContainer.scrollHeight;
+            }
+            
+            updateStatus(text, className) {
+                this.statusText.textContent = text;
+                this.statusElement.className = `status ${className}`;
+            }
+        }
+        
+        // Initialize the client when page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            new ComputerUseClient();
+        });
+    </script>
+</body>
+</html>
