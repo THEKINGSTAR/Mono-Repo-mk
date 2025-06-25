@@ -123,7 +123,7 @@ class DemoClient:
                         timestamp = msg['timestamp'][:19]  # Truncate timestamp
                         print(f"   💬 [{timestamp}] {msg['role']}: {msg['content'][:50]}...")
                 else:
-                    print(f"   ❌ Failed to get history: {response.status}")
+                    print(f"   �� Failed to get history: {response.status}")
     
     async def cleanup_session(self):
         """Clean up the session"""
