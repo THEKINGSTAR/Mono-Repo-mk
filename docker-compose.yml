@@ -7,78 +7,28 @@ services:
       - "8000:8000"
     environment:
       - DATABASE_URL=postgresql://cambioml:password@postgres:5432/cambioml
-      - REDIS_URL=redis://redis:6379
       - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
-      - DEBUG=${DEBUG:-false}
-      - LOG_LEVEL=${LOG_LEVEL:-info}
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-      - ./logs:/app/logs
     depends_on:
-      postgres:
-        condition: service_healthy
-      redis:
-        condition: service_healthy
-    restart: unless-stopped
-    networks:
-      - cambioml-network
+      - postgres
+      - redis
 
   postgres:
-    image: postgres:15-alpine
+    image: postgres:15
     environment:
       - POSTGRES_DB=cambioml
       - POSTGRES_USER=cambioml
       - POSTGRES_PASSWORD=password
-      - POSTGRES_INITDB_ARGS=--encoding=UTF-8 --lc-collate=C --lc-ctype=C
     volumes:
       - postgres_data:/var/lib/postgresql/data
-      - ./scripts/init_db.sql:/docker-entrypoint-initdb.d/init_db.sql
     ports:
       - "5432:5432"
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U cambioml -d cambioml"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-    restart: unless-stopped
-    networks:
-      - cambioml-network
 
   redis:
     image: redis:7-alpine
-    command: redis-server --appendonly yes --requirepass ${REDIS_PASSWORD:-cambioml123}
-    volumes:
-      - redis_data:/data
     ports:
       - "6379:6379"
-    healthcheck:
-      test: ["CMD", "redis-cli", "--raw", "incr", "ping"]
-      interval: 10s
-      timeout: 3s
-      retries: 5
-    restart: unless-stopped
-    networks:
-      - cambioml-network
-
-  # VNC Base Container (for agent sessions)
-  vnc-base:
-    image: ghcr.io/anthropics/anthropic-quickstarts:computer-use-demo
-    profiles:
-      - vnc-template
-    environment:
-      - DISPLAY=:1
-      - VNC_PASSWORD=cambioml123
-    volumes:
-      - /tmp/.X11-unix:/tmp/.X11-unix:rw
-    networks:
-      - cambioml-network
 
 volumes:
   postgres_data:
-    driver: local
-  redis_data:
-    driver: local
-
-networks:
-  cambioml-network:
-    driver: bridge
