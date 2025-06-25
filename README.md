@@ -15,7 +15,7 @@ This project replaces the experimental Streamlit interface from Anthropic's comp
 
 ## 🏗️ Architecture
 
-```
+\`\`\`
 ┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
 │   Frontend      │    │   FastAPI       │    │   PostgreSQL    │
 │   (HTML/JS)     │◄──►│   Backend       │◄──►│   Database      │
@@ -34,7 +34,7 @@ This project replaces the experimental Streamlit interface from Anthropic's comp
                        │   (Remote       │
                        │   Desktop)      │
                        └─────────────────┘
-```
+\`\`\`
 
 ### Core Components
 
@@ -70,32 +70,32 @@ This project replaces the experimental Streamlit interface from Anthropic's comp
 ### Installation
 
 1. **Clone the repository**
-   ```bash
+   \`\`\`bash
    git clone <your-repo-url>
    cd cambioml-backend
-   ```
+   \`\`\`
 
 2. **Install dependencies**
-   ```bash
+   \`\`\`bash
    chmod +x scripts/install_deps.sh
    ./scripts/install_deps.sh
    source venv/bin/activate
-   ```
+   \`\`\`
 
 3. **Set up environment**
-   ```bash
+   \`\`\`bash
    cp .env.example .env
    # Edit .env and add your ANTHROPIC_API_KEY
-   ```
+   \`\`\`
 
 4. **Run the system**
-   ```bash
+   \`\`\`bash
    # Option 1: Full system with Docker
    docker-compose up --build
 
    # Option 2: Development mode
    uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
-   ```
+   \`\`\`
 
 5. **Access the application**
    - Frontend: http://localhost:8000/static/index.html
@@ -106,10 +106,10 @@ This project replaces the experimental Streamlit interface from Anthropic's comp
 
 Run the mock demo to see the system in action:
 
-```bash
+\`\`\`bash
 source venv/bin/activate
 python scripts/simple_demo.py
-```
+\`\`\`
 
 ## 📚 API Documentation
 
@@ -126,14 +126,14 @@ python scripts/simple_demo.py
 
 #### Session Creation
 
-```bash
+\`\`\`bash
 curl -X POST "http://localhost:8000/sessions" \
      -H "Content-Type: application/json" \
      -d '{}'
-```
+\`\`\`
 
 Response:
-```json
+\`\`\`json
 {
   "id": "550e8400-e29b-41d4-a716-446655440000",
   "status": "active",
@@ -141,7 +141,7 @@ Response:
   "websocket_url": "/ws/550e8400-e29b-41d4-a716-446655440000",
   "created_at": "2024-01-15T10:30:00Z"
 }
-```
+\`\`\`
 
 ### WebSocket Endpoints
 
@@ -150,20 +150,20 @@ Response:
 Connect to: `ws://localhost:8000/ws/{session_id}`
 
 **Send Message:**
-```json
+\`\`\`json
 {
   "content": "Take a screenshot of the desktop"
 }
-```
+\`\`\`
 
 **Receive Response:**
-```json
+\`\`\`json
 {
   "type": "agent_response",
   "content": "I'll take a screenshot for you...",
   "timestamp": "2024-01-15T10:30:00Z"
 }
-```
+\`\`\`
 
 #### VNC Connection
 
@@ -175,7 +175,7 @@ Provides WebSocket proxy for VNC connections to agent containers.
 
 ### Sessions Table
 
-```sql
+\`\`\`sql
 CREATE TABLE sessions (
     id VARCHAR PRIMARY KEY,
     container_id VARCHAR NOT NULL,
@@ -183,11 +183,11 @@ CREATE TABLE sessions (
     status VARCHAR DEFAULT 'active',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
-```
+\`\`\`
 
 ### Chat Messages Table
 
-```sql
+\`\`\`sql
 CREATE TABLE chat_messages (
     id VARCHAR PRIMARY KEY,
     session_id VARCHAR NOT NULL,
@@ -196,7 +196,7 @@ CREATE TABLE chat_messages (
     timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     metadata JSON
 );
-```
+\`\`\`
 
 ## 🐳 Docker Configuration
 
@@ -209,7 +209,7 @@ CREATE TABLE chat_messages (
 
 ### Environment Variables
 
-```bash
+\`\`\`bash
 # Required
 ANTHROPIC_API_KEY=your_api_key_here
 
@@ -222,11 +222,11 @@ REDIS_URL=redis://redis:6379
 # Optional
 DEBUG=false
 LOG_LEVEL=info
-```
+\`\`\`
 
 ### Docker Commands
 
-```bash
+\`\`\`bash
 # Start all services
 docker-compose up -d
 
@@ -241,13 +241,13 @@ docker-compose up --build -d
 
 # Clean up volumes
 docker-compose down -v
-```
+\`\`\`
 
 ## 🔧 Development
 
 ### Project Structure
 
-```
+\`\`\`
 cambioml-backend/
 ├── app/                          # FastAPI application
 │   ├── main.py                   # Application entry point
@@ -269,20 +269,20 @@ cambioml-backend/
 ├── Dockerfile                   # Application container
 ├── requirements.txt             # Python dependencies
 └── .env.example                # Environment template
-```
+\`\`\`
 
 ### Running in Development Mode
 
 1. **Start database services**
-   ```bash
+   \`\`\`bash
    docker-compose up postgres redis -d
-   ```
+   \`\`\`
 
 2. **Run FastAPI in development**
-   ```bash
+   \`\`\`bash
    source venv/bin/activate
    uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
-   ```
+   \`\`\`
 
 3. **Access development tools**
    - Auto-reload on code changes
@@ -301,7 +301,7 @@ cambioml-backend/
 
 ### Running Tests
 
-```bash
+\`\`\`bash
 # Unit tests
 python -m pytest tests/unit/
 
@@ -313,11 +313,11 @@ python -m pytest tests/e2e/
 
 # All tests with coverage
 python -m pytest --cov=app tests/
-```
+\`\`\`
 
 ### Demo Scripts
 
-```bash
+\`\`\`bash
 # Mock demo (no backend required)
 python scripts/simple_demo.py
 
@@ -326,13 +326,13 @@ python scripts/demo_script.py
 
 # Load testing
 python scripts/load_test.py
-```
+\`\`\`
 
 ## 📊 Monitoring and Logging
 
 ### Application Logs
 
-```bash
+\`\`\`bash
 # View application logs
 docker-compose logs backend
 
@@ -341,11 +341,11 @@ docker-compose logs -f backend
 
 # Filter by log level
 docker-compose logs backend | grep ERROR
-```
+\`\`\`
 
 ### Database Monitoring
 
-```bash
+\`\`\`bash
 # Connect to PostgreSQL
 docker-compose exec postgres psql -U cambioml -d cambioml
 
@@ -354,7 +354,7 @@ SELECT * FROM sessions WHERE status = 'active';
 
 # View recent messages
 SELECT * FROM chat_messages ORDER BY timestamp DESC LIMIT 10;
-```
+\`\`\`
 
 ### Performance Metrics
 
@@ -388,27 +388,27 @@ SELECT * FROM chat_messages ORDER BY timestamp DESC LIMIT 10;
 ### Production Deployment
 
 1. **Environment Setup**
-   ```bash
+   \`\`\`bash
    # Production environment variables
    export ANTHROPIC_API_KEY=your_production_key
    export DATABASE_URL=your_production_db_url
    export REDIS_URL=your_production_redis_url
-   ```
+   \`\`\`
 
 2. **Docker Deployment**
-   ```bash
+   \`\`\`bash
    # Build production image
    docker build -t cambioml-backend:latest .
 
    # Deploy with docker-compose
    docker-compose -f docker-compose.prod.yml up -d
-   ```
+   \`\`\`
 
 3. **Kubernetes Deployment**
-   ```bash
+   \`\`\`bash
    # Apply Kubernetes manifests
    kubectl apply -f k8s/
-   ```
+   \`\`\`
 
 ### Scaling Considerations
 
@@ -422,50 +422,50 @@ SELECT * FROM chat_messages ORDER BY timestamp DESC LIMIT 10;
 ### Common Issues
 
 1. **Container Creation Fails**
-   ```bash
+   \`\`\`bash
    # Check Docker daemon
    docker info
    
    # Check available resources
    docker system df
-   ```
+   \`\`\`
 
 2. **Database Connection Issues**
-   ```bash
+   \`\`\`bash
    # Test database connection
    docker-compose exec postgres pg_isready
    
    # Check database logs
    docker-compose logs postgres
-   ```
+   \`\`\`
 
 3. **WebSocket Connection Drops**
-   ```bash
+   \`\`\`bash
    # Check backend logs
    docker-compose logs backend | grep websocket
    
    # Test WebSocket endpoint
    wscat -c ws://localhost:8000/ws/test-session
-   ```
+   \`\`\`
 
 4. **VNC Connection Problems**
-   ```bash
+   \`\`\`bash
    # Check VNC port availability
    netstat -tulpn | grep 590
    
    # Test VNC connection
    vncviewer localhost:5900
-   ```
+   \`\`\`
 
 ### Debug Mode
 
 Enable debug logging:
 
-```bash
+\`\`\`bash
 export DEBUG=true
 export LOG_LEVEL=debug
 docker-compose up --build
-```
+\`\`\`
 
 ## 📈 Performance Optimization
 
@@ -511,12 +511,12 @@ docker-compose up --build
 
 ### Commit Guidelines
 
-```
+\`\`\`
 feat: add new session management endpoint
 fix: resolve WebSocket connection timeout
 docs: update API documentation
 test: add integration tests for container service
-```
+\`\`\`
 
 ## 📄 License
 
@@ -542,4 +542,4 @@ For questions, issues, or contributions:
 **Built for the CambioML Founding Backend Engineer Challenge**
 
 *Demonstrating scalable backend architecture for AI agent session management*
-```
+\`\`\`
